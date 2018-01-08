@@ -1,18 +1,23 @@
 from flask import Flask
 from flask_sockets import Sockets
 import boto3
+import botocore
 
 app = Flask(__name__)
 app.config.from_pyfile('aws_config.cfg')
 sockets = Sockets(app)
 
 
-def get_available_models():
-    session = boto3.session.Session(
+def get_session():
+    return boto3.session.Session(
         aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
         aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'],
         region_name=app.config['REGION_NAME']
     )
+
+
+def get_available_models():
+    session = get_session()
     s3 = session.resource('s3')
 
     bucket = s3.Bucket(app.config['S3_BUCKET'])
@@ -36,10 +41,21 @@ def update_models():
 @sockets.route('/label/<string:model_name>')
 def label(ws, model_name):
     """Use model with given name to predict label for data in each message"""
-    while not ws.closed:
-        message = ws.receive()
 
-        ws.send(model_name)
+    session = get_session()
+    s3 = session.resource('s3')
+
+    try:
+        s3.Object(app.config['S3_BUCKET'], model_name).download_file(model_name)
+    except botocore.exceptions.ClientError:
+        ws.send('Error: model file not found')
+        ws.close()
+    else:
+        while not ws.closed:
+            message = ws.receive()
+
+            ws.send(model_name)
+
 
 if __name__ == '__main__':
     from gevent import pywsgi

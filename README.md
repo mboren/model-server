@@ -31,12 +31,18 @@ This project's structure is based on Heroku's [Miniconda example](https://github
 
 ## Deploy this Application:
 
-Deploy with the [Container Registry and Runtime](https://devcenter.heroku.com/articles/container-registry-and-runtime):
+- Get the access key id and secret access key for an IAM user with Get and List permissions for the S3 bucket models will be stored in.
+
+- Create a config file and add those credentials to it:
+    $ cd webapp
+    $ cp aws_config.cfg.example aws_config.cfg
+    $ vi webapp/aws_config.cfg
+    $ cd ..
+
+- Deploy with the [Container Registry and Runtime](https://devcenter.heroku.com/articles/container-registry-and-runtime):
 
      $ heroku plugins:install heroku-container-registry
      $ heroku container:login
-     
-     $ cd model-server
      
      $ heroku create
      $ heroku container:push 

@@ -1,0 +1,4 @@
+AWS_ACCESS_KEY_ID = 'Your access key id'
+AWS_SECRET_ACCESS_KEY = 'Your secret access key'
+REGION_NAME = 'us-west-1'
+S3_BUCKET = 'Name of bucket with models in it'

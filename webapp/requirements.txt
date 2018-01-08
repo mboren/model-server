@@ -1,0 +1,9 @@
+gunicorn
+Flask
+Flask-Sockets
+gevent
+gevent-websocket
+Jinja2
+Werkzeug
+distribute
+wsgiref

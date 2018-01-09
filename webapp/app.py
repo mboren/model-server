@@ -55,6 +55,7 @@ def update_models():
 
     return 'update models', 501
 
+
 @sockets.route('/label/<string:model_name>')
 def label(ws, model_name):
     """Use model with given name to predict label for data in each message"""

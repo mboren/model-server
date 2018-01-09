@@ -1,11 +1,28 @@
+import json
 from flask import Flask
 from flask_sockets import Sockets
 import boto3
 import botocore
+import numpy as np
+import keras
+from keras.models import load_model
+import tensorflow as tf
+
 
 app = Flask(__name__)
 app.config.from_pyfile('aws_config.cfg')
 sockets = Sockets(app)
+
+graph = tf.get_default_graph()
+
+
+def get_prediction(model, image):
+    """Preprocess image, pass to model, and return prediction"""
+    _, rows, cols, channels = model.layers[0].input_shape
+    reshaped = np.array([np.reshape(image, (rows, cols, channels))])
+    result = model.predict(reshaped, batch_size=1)
+
+    return result[0]
 
 
 def get_session():
@@ -51,10 +68,19 @@ def label(ws, model_name):
         ws.send('Error: model file not found')
         ws.close()
     else:
+        model = load_model(model_name)
+        model._make_predict_function()
+
         while not ws.closed:
             message = ws.receive()
+            js = json.loads(message)
+            arr = np.asarray(js)
 
-            ws.send(model_name)
+            global graph
+            with graph.as_default():
+                pred = get_prediction(model, arr)
+
+            ws.send(str(list(pred)))
 
 
 if __name__ == '__main__':

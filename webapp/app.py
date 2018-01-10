@@ -49,6 +49,14 @@ def dashboard():
     return 'Available models: {}'.format(model_file_names)
 
 
+@app.route('/models')
+def models():
+    """Get list of valid model names"""
+    model_file_names = [key.key for key in get_available_models()]
+
+    return json.dumps({'models': model_file_names})
+
+
 @app.route('/models/<string:model_name>/input_shape')
 def get_input_shape(model_name):
     """Get dimensions and number of channels of input image"""

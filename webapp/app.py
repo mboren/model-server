@@ -49,6 +49,34 @@ def dashboard():
     return 'Available models: {}'.format(model_file_names)
 
 
+@app.route('/models/<string:model_name>/input_shape')
+def get_input_shape(model_name):
+    """Get dimensions and number of channels of input image"""
+    session = get_session()
+    s3 = session.resource('s3')
+
+    try:
+        s3.Object(app.config['S3_BUCKET'], model_name).download_file(model_name)
+    except botocore.exceptions.ClientError:
+        return json.dumps({'error': 'failed to load model'})
+    else:
+        global graph
+
+        with graph.as_default():
+            model = load_model(model_name)
+            data_format = model.layers[0].data_format
+            if data_format == 'channels_last':
+                _, height, width, channels = model.layers[0].input_shape
+            elif data_format == 'channels_first':
+                _, channels, height, width = model.layers[0].input_shape
+
+        return json.dumps({
+            'width': width,
+            'height': height,
+            'channels': channels
+        })
+
+
 @sockets.route('/models/<string:model_name>/get_predictions')
 def label(ws, model_name):
     """Use model with given name to predict label for data in each message"""

@@ -49,7 +49,7 @@ def dashboard():
     return 'Available models: {}'.format(model_file_names)
 
 
-@sockets.route('/label/<string:model_name>')
+@sockets.route('/models/<string:model_name>/get_predictions')
 def label(ws, model_name):
     """Use model with given name to predict label for data in each message"""
 

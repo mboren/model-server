@@ -49,13 +49,6 @@ def dashboard():
     return 'Available models: {}'.format(model_file_names)
 
 
-@app.route('/update_models')
-def update_models():
-    """Reload list of models from S3"""
-
-    return 'update models', 501
-
-
 @sockets.route('/label/<string:model_name>')
 def label(ws, model_name):
     """Use model with given name to predict label for data in each message"""

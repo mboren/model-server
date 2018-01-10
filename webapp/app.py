@@ -69,19 +69,20 @@ def label(ws, model_name):
         ws.send('Error: model file not found')
         ws.close()
     else:
-        model = load_model(model_name)
-        model._make_predict_function()
+        global graph
 
-        while not ws.closed:
-            message = ws.receive()
-            js = json.loads(message)
-            arr = np.asarray(js)
+        with graph.as_default():
+            model = load_model(model_name)
+            model._make_predict_function()
 
-            global graph
-            with graph.as_default():
+            while not ws.closed:
+                message = ws.receive()
+                js = json.loads(message)
+                arr = np.asarray(js)
+
                 pred = get_prediction(model, arr)
 
-            ws.send(str(list(pred)))
+                ws.send(str(list(pred)))
 
 
 if __name__ == '__main__':

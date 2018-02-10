@@ -1,5 +1,9 @@
 # HTTP/Websocket server for running Keras models on Heroku
 
+February 2018 update: I don't have access to enough compute to scale this
+beyond extremely tiny images right now, which is boring, so I'm going to put
+the project on hold for a while.
+
 This repository contains two things:
 
 - A `Dockerfile`, which installs [scikit-image](http://scikit-image.org/) and [Keras](https://keras.io) with [miniconda](http://conda.pydata.org/miniconda.html), and a few [pip](https://pip.pypa.io/en/stable/) dependencies.
